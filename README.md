@@ -10,6 +10,10 @@
 出発直前(10分前)に急な降雨があると、電車に切り替えるための
 準備時間が足りず慌ててしまう、という課題を解決するために開発した。
 
+開発にあたっては既存の天気・服装提案アプリ（そらコーデ、
+Yahoo！天気コーデ等）を調査した上で、「服装」でも「傘」でもなく
+「交通手段の判断支援」という、既存アプリにない切り口に絞った。
+
 ##　主な機能
 
 - Open-Meteo APIから、出発時刻前後の降水確率を取得
@@ -20,30 +24,52 @@
 ## 使用技術
 
 - Python 3.9
-- FASTAPI
+- requests（外部API連携）
+-　Open-Meteo API(天気情報取得)
 - LINE Messaging API(通知)
+- python-dotenv（環境変数管理）
 -cron(定期実行)
+
+## ディレクトリ構成
+
+```
+weather_app/
+├── app/
+│   ├── config.py            # 緯度経度・閾値・LINE設定
+│   ├── weather_fetcher.py   # Open-Meteoから天気取得
+│   ├── judge.py             # 自転車/電車の判定ロジック
+│   ├── line_notifier.py     # LINE通知の送信
+│   └── main.py              # 全体の実行フロー
+└── scripts/
+    └── run_daily.sh         # cron用の自動実行スクリプト
+```
 
 ## セットアップ方法
 
-\'\'\'bash
+'''bash
 pip install -r requirements.txt
-\'\'\'
+'''
 
-\'.env\'に以下を設定してください。
+'.env'に以下を設定してください。
 
-\'\'\'
+'''
 LINE_CAHNNEL_ACCCESS_TOKEN=your_token_here
-\'\'\'
+'''
+
+'app/config.py'で、自宅の緯度、経度、出発時刻、降水確率の閾値を設定してください。
 
  ## 実行方法
 
- \'\'\'bash
+ '''bash
  python3 -m app.main
- \'\'\'
+ '''
+ 
+## 自動実行(cron)
+'scripts/run_daily.sh'をcrontabに登録することで、
+平日の決まった時刻に自動実行されます。
 
  ## 今後の展望
 
- - ユーザー登録機能を追加し、不数人が使えるようにする
- - 電車遅延情報との連携
+ - ユーザー登録機能を追加し、複数人が使えるようにする(Webhook + userId方式への移行)
+ - 電車・バスの遅延情報との連携（OOPD等のオープンデータAPI活用を検討）
  - 退勤時刻の天気を考慮した帰宅判断通知
