@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from app.schemas import UserCreate, LoginRequest
 
 from app.models import SessionLocal, User
 from app.auth import hash_password, verify_password, create_access_token
@@ -7,13 +7,7 @@ from app.auth import hash_password, verify_password, create_access_token
 router = APIRouter()
 
 
-class UserCreate(BaseModel):
-    username: str
-    password: str
 
-class LoginRequest(BaseModel):
-    username: str
-    password: str
 
 
 @router.post("/register")
