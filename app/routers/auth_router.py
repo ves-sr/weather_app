@@ -1,23 +1,19 @@
-from fastapi import APIRouter, HTTPException
-from app.schemas import UserCreate, LoginRequest
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
 
-from app.models import SessionLocal, User
+from app.schemas import UserCreate, LoginRequest
+from app.database import get_db
+from app.models import User
 from app.auth import hash_password, verify_password, create_access_token
 
 router = APIRouter()
 
-
-
-
-
 @router.post("/register")
-def register(user: UserCreate):
+def register(user: UserCreate, session: Session = Depends(get_db)):
     """新しいユーザーを登録する"""
-    session = SessionLocal()
 
     existing_user = session.query(User).filter(User.username == user.username).first()
     if existing_user is not None:
-        session.close()
         raise HTTPException(status_code=400, detail="そのユーザー名はすでに使われています")
     
     new_user = User(
@@ -27,16 +23,13 @@ def register(user: UserCreate):
     session.add(new_user)
     session.commit()
     session.refresh(new_user)
-    session.close()
 
     return {"id": new_user.id, "username":new_user.username}
 
 
 @router.post("/login")
-def login(request: LoginRequest):
-    session = SessionLocal()
+def login(request: LoginRequest, session: Session = Depends(get_db)):
     user = session.query(User).filter(User.username == request.username).first()
-    session.close()
 
     if user is None or not verify_password(request.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="ユーザー名またはパスワードが正しくありません")
