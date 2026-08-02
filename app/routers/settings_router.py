@@ -1,3 +1,6 @@
+import random
+import string
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -65,6 +68,24 @@ def get_setting(
         "notify_minute": setting.notify_minute,
         "rain_threshold": setting.rain_threshold,
     }
+
+
+@router.post("/link-code")
+def issue_link_code(
+    username: str = Depends(get_current_username),
+    session: Session = Depends(get_db)
+):
+    """LINE連携用の一時コードを発行する"""
+    user = session.query(User).filter(User.username==username).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="ユーザーが見つかりません")
+
+    code = "".join(random.choices(string.digits, k=6))
+    user.link_code = code
+    session.commit()
+
+    return {"link_code": code, "message": "このコードをLINEのbotにメッセージとして送信してください"}
+
 
 
 
