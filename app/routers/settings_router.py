@@ -56,7 +56,7 @@ def get_setting(
     setting = session.query(UserSetting).filter(UserSetting.user_id == user.id).first()
 
     if setting is None:
-        raise HTTPException(status_code=404, detail="設定がまだ灯籠されていません")
+        raise HTTPException(status_code=404, detail="設定がまだ登録されていません")
 
     return {
         "latitude": setting.latitude,
