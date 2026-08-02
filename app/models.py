@@ -13,6 +13,7 @@ class User(Base):
     username = Column(String, unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     line_user_id = Column(String, unique=True, nullable=True)
+    link_code = Column(String, unique=True, nullable=True)
     
 
     setting = relationship("UserSetting", back_populates="user", uselist=False)
