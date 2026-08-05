@@ -1,3 +1,5 @@
 .env
 run.log
 *.db
+project_starter_guide.md
+notes.md
