@@ -65,3 +65,16 @@ export async function issueLinkCode(token: string) {
   });
   return handleResponse<{ link_code: string; message: string }>(response);
 }
+
+export type Judgment = {
+  transport: string;
+  probability: number;
+  time: string;
+};
+
+export async function getJudgment(token: string) {
+  const response = await fetch(`${API_BASE_URL}/judgment`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return handleResponse<Judgment>(response);
+}
